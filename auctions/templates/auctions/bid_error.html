@@ -1,0 +1,12 @@
+{% extends "auctions/auction.html" %}
+
+{% block noti %}
+    <div style="background-color: #F08080;">
+        <h5>Error</h5>
+        <ul>
+            <li>You have not enter your bid</li>
+            <li>Your bid must higher than the current price</li>
+            <li>If there are no bids yet, your bid must equal or higher the starting price</li>
+        </ul>
+    </div>
+{% endblock %}

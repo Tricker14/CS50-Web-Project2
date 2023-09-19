@@ -1,0 +1,114 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <style>
+        #bid {
+            width: 100%;
+            height: 30px;
+        }
+        #comment {
+            width: 100%;
+            height: 150px;
+        }
+        #img {
+            width: 25%;
+        }
+        #not_sold {
+            display: inline-block;
+            background-color: #F08080;
+        }
+        #winner {
+            display: inline-block;
+            background-color: #7CFC00;
+        }
+    </style>
+
+    {% block noti %}
+    {% endblock %}
+
+    <h2>Listing: {{ auction.name }}</h2>
+    {% if auction in request.user.watchlist_action.product.all %}
+        <form action="{% url 'remove_watchlist' auction.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Remove from watchlist">
+        </form><br>
+    {% else %}
+        <form action="{% url 'add_watchlist' auction.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Add to watchlist">
+        </form><br>
+    {% endif %}
+    {% if auction.image_URL %}
+        <img id="img" src="{{ auction.image_URL }}" alt="Auction Image">
+    {% else %}
+        No image
+    {% endif %}
+    <p>{{ auction.description }}</p>
+    <h4> ${{ bid }}</h4>
+
+    {% if auction.winner %}
+        <p>{{ total_bid }} bid(s) so far.
+            {% if user == auction.winner and user == auction.owner %}
+                <p id="not_sold">Not sold anymore</p>
+            {% elif user == auction.winner and user != auction.owner %}
+                <p id="winner">You are the winner</p>
+            {% else %}
+                {% if total_bid != 0 %}
+                    <p id="winner">{{ auction.winner }} is the winner</p>
+                {% else %}
+                    <p id="not_sold">Not sold anymore</p>
+                {% endif %}
+            {% endif %}
+        </p>
+    {% else %}
+        <p>{{ total_bid }} bid(s) so far.
+            {% if highest_bidder %}
+                {% if highest_bidder == user %}
+                    <span>You are the current bid</span>
+                {% else %}
+                    <span>{{ highest_bidder }} is the highest bidder</span>
+                {% endif %}
+            {% else %}
+                <span>No bidder yet</span>
+            {% endif %}
+        </p>
+        {% if user != auction.owner %}
+                <form action="{% url 'place_bid' auction.id%}" method="post">
+                    {% csrf_token %}
+                    <textarea id="bid" type="text" placeholder="Bid" name="bid"></textarea><br>
+                    <input type="submit" value="Place bid">
+                </form><br>
+        {% else %}
+            <form action="{% url 'close_auction' auction.id%}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Close Listing">
+            </form><br>
+        {% endif %}
+    {% endif %}
+
+    <h5>Details</h5>
+    <ul>
+        {% if auction.owner == user %}
+            <li>You listed this item</li>
+        {% else %}
+            <li>Listed by: {{ auction.owner }}</li>
+        {% endif %}
+        <li>Category: {{ auction.category }}</li>
+        <li>
+            Comment Section:
+            <ul>
+                {% for comment in auction.comment.all %}
+                <li>
+                    {{ comment.comment }} -- {{ comment.commenter }}
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
+    <form action="{% url 'add_comment' auction.id%}" method="post">
+        {% csrf_token %}
+        <label for="comment">Comment here:</label><br>
+        <textarea id="comment" name="comment"></textarea><br>
+        <input type="submit" value="Save">
+    </form>
+{% endblock %}

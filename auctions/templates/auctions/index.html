@@ -1,0 +1,129 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <style>
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #item {
+            width: 23%;
+            margin: 10px;
+            background-color: #f3f3f3;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-family: sans-serif;
+        }
+        #link {
+            color: black
+        }
+        #img {
+            max-width: 100%;
+            height: auto;
+        }
+        #name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        #price {
+            font-size: 18px;
+            font-weight: bold;
+            display: inline;
+        }
+        #number {
+            font-size: 18px;
+            display: inline;
+        }
+        #date {
+            color: dimgrey;
+            font-size: 15px;
+            display: inline;
+        }
+        #no_listing {
+            display: flex;
+            height: 40px;
+            width: 100%;
+            background-color: #add8e6; /* Light blue */
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+
+    {% block name %}
+        <h2>Active Listings</h2>
+    {% endblock %}
+    {% if auctions|length > 1 %}
+        <div id="container">
+            {% for auction in auctions %}
+                {% if not auction.winner %}
+                    <div id="item">
+                        <a id="link" href="{% url 'auction' auction.id %}">
+                            <div id="name">
+                                {{ auction.name }}
+                            </div>
+                            <div>
+                                {% if auction.bid.all %}
+                                    <p id="price">Price:</p> <p id="number">${{ auction.bid.last.price }}</p>
+                                {% else %}
+                                    <p id="price">Price:</p> <p id="number">${{ auction.starting_bid }}</p>
+                                {% endif %}
+                            </div>
+                            <div id="description">
+                                {{ auction.description }}
+                            </div>
+                            {% if auction.image_URL %}
+                                <img id="img" src="{{ auction.image_URL }}" alt="Auction Image">
+                            {% else %}
+                                No image
+                            {% endif %}
+                        </a>
+                        <div id="date">
+                            Created: {{ auction.created_date }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% elif auctions|length == 1 %}
+        <div id="container">
+            {% for auction in auctions %}
+                {% if not auction.winner %}
+                    <div id="item">
+                        <a id="link" href="{% url 'auction' auction.id %}">
+                            <div id="name">
+                                {{ auction.name }}
+                            </div>
+                            <div>
+                                {% if auction.bid.all %}
+                                    <p id="price">Price:</p> <p id="number">${{ auction.bid.last.price }}</p>
+                                {% else %}
+                                    <p id="price">Price:</p> <p id="number">${{ auction.starting_bid }}</p>
+                                {% endif %}
+                            </div>
+                            <div id="description">
+                                {{ auction.description }}
+                            </div>
+                            {% if auction.image_URL %}
+                                <img id="img" src="{{ auction.image_URL }}" alt="Auction Image">
+                            {% else %}
+                                No image
+                            {% endif %}
+                        </a>
+                        <div id="date">
+                            Created: {{ auction.created_date }}
+                        </div>
+                    </div>
+                {% else %}
+                    <div id="no_listing">
+                        No items available
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div id="no_listing">
+            No items available
+        </div>
+    {% endif %}
+{% endblock %}

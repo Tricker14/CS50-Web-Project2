@@ -1,0 +1,40 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <style>
+        #title, #starting_bid, #category, #image_URL {
+            width: 100%;
+        }
+        #description {
+            width: 100%;
+            height: 200px;
+        }
+    </style>
+
+    <h3>Create New Auction</h3>
+    <div>
+        <form action="{% url 'create' %}" method="post">
+            {% csrf_token %}
+            <label for="title">Title</label><br>
+            <input id="title" type="text" name="title"><br>
+            <label for="description">Description</label><br>
+            <textarea id="description" name="description"></textarea><br>
+
+            <label for="category">Category</label>
+            <select name="category">
+                <option value=""></option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category }}</option>
+                {% endfor %}
+            </select><br>
+
+            <label for="starting_bid">Starting bid</label><br>
+            <input id="starting_bid" type="number" name="starting_bid"><br>
+            <label for="image_URL">Image URL</label><br>
+            <input id="image_URL" type="text" name="image_URL"><br><br> 
+
+            <input type="submit" value="Save">
+        </form>
+    </div>
+
+{% endblock %}
